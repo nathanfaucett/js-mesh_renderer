@@ -51,7 +51,7 @@ var scene = global.scene = Scene.create(),
         wireframeLineWidth: 1
     }),
 
-    geometry = Geometry.create({name: "geometry_box", src: "box.json"});
+    geometry = Geometry.create({name: "geometry", src: "geometry.json"});
 
 
 camera.set(512, 512);

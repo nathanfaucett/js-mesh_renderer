@@ -16,10 +16,11 @@ function MeshRenderer() {
     Renderer.call(this);
 
     function renderMesh(mesh) {
-        return _this.renderMesh(mesh, renderMesh.camera, renderMesh.webglPlugin);
+        return _this.renderMesh(mesh, renderMesh.viewMatrix, renderMesh.projectionMatrix, renderMesh.webglPlugin);
     }
-    renderMesh.set = function(camera, webglPlugin) {
-        renderMesh.camera = camera;
+    renderMesh.set = function(viewMatrix, projectionMatrix, webglPlugin) {
+        renderMesh.viewMatrix = viewMatrix;
+        renderMesh.projectionMatrix = projectionMatrix;
         renderMesh.webglPlugin = webglPlugin;
         return renderMesh;
     };
@@ -32,16 +33,20 @@ MeshRendererPrototype = MeshRenderer.prototype;
 MeshRendererPrototype.render = function() {
     var sceneRenderer = this.sceneRenderer,
         webglPlugin = sceneRenderer.getPlugin("webgl_plugin.WebGLPlugin"),
+
         scene = sceneRenderer.scene,
         meshMananger = scene.getComponentManager("mesh.Mesh"),
-        camera = scene.getComponentManager("camera.Camera").getActive();
 
-    meshMananger.forEach(this._renderMesh.set(camera, webglPlugin));
+        camera = scene.getComponentManager("camera.Camera").getActive(),
+        viewMatrix = camera.getView(),
+        projectionMatrix = camera.getProjection();
+
+    meshMananger.forEach(this._renderMesh.set(viewMatrix, projectionMatrix, webglPlugin));
 };
 
 var modelView = mat4.create(),
     normalMatrix = mat3.create();
-MeshRendererPrototype.renderMesh = function(mesh, camera, webglPlugin) {
+MeshRendererPrototype.renderMesh = function(mesh, viewMatrix, projectionMatrix, webglPlugin) {
     var context = webglPlugin.context,
         gl = context.gl,
 
@@ -56,13 +61,13 @@ MeshRendererPrototype.renderMesh = function(mesh, camera, webglPlugin) {
 
         indexBuffer;
 
-    transform.calculateModelView(camera.getView(), modelView);
+    transform.calculateModelView(viewMatrix, modelView);
     transform.calculateNormalMatrix(modelView, normalMatrix);
 
     context.setProgram(program);
 
     webglPlugin.bindMaterial(meshMaterial);
-    webglPlugin.bindUniforms(camera.getProjection(), modelView, normalMatrix, meshMaterial.uniforms, program.uniforms);
+    webglPlugin.bindUniforms(projectionMatrix, modelView, normalMatrix, meshMaterial.uniforms, program.uniforms);
     webglPlugin.bindBoneUniforms(mesh.bones, program.uniforms);
     webglPlugin.bindAttributes(geometry.buffers.getObject(), geometry.getVertexBuffer(), program.attributes);
 
