@@ -64,7 +64,7 @@ cameraTransform.lookAt([0, 0, 0]);
 
 scene.addEntity(Entity.create().addComponent(cameraTransform, camera));
 
-geometry._load(function onLoad(error) {
+geometry.load(function onLoad(error) {
     var meshTransform = Transform3D.create();
 
     scene.addEntity(
