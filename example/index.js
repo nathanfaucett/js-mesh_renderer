@@ -91,6 +91,8 @@ geometry.load(function onLoad(error) {
 
         cameraTransform._localPosition[0] = (Math.sin(time) * 10);
         cameraTransform._localPosition[1] = (Math.cos(time) * 10);
+        cameraTransform.setNeedsUpdate();
+
         cameraTransform.lookAt(meshTransform);
 
         scene.update();

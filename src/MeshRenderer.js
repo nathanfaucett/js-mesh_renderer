@@ -51,13 +51,18 @@ MeshRendererPrototype.renderMesh = function(mesh, viewMatrix, projectionMatrix, 
         gl = context.gl,
 
         entity = mesh.entity,
-        transform = entity.getComponent("transform.Transform3D") || entity.getComponents("transform.Transform2D"),
+        transform = (
+            entity.getComponent("transform.Transform3D") ||
+            entity.getComponents("transform.Transform2D")
+        ),
 
         meshMaterial = mesh.material,
         meshGeometry = mesh.geometry,
 
         geometry = webglPlugin.getGLGeometry(meshGeometry),
-        program = webglPlugin.getGLMaterial(meshMaterial).getProgramFor(meshGeometry),
+        program = webglPlugin
+        .getGLMaterial(meshMaterial)
+        .getProgramFor(meshGeometry),
 
         indexBuffer;
 
