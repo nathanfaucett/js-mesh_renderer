@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@nathanfaucett/mat3": "^0.0.2",
-    "@nathanfaucett/mat4": "^0.0.2",
+    "@nathanfaucett/mat4": "^0.0.4",
     "@nathanfaucett/scene_renderer": "git://github.com/nathanfaucett/js-scene_renderer.git"
   }
 }
