@@ -3,14 +3,18 @@ var sceneGraph = require("@nathanfaucett/scene_graph"),
     cameraComponent = require("@nathanfaucett/camera_component"),
     transformComponents = require("@nathanfaucett/transform_components"),
     meshComponent = require("@nathanfaucett/mesh_component"),
+    assets = require("@nathanfaucett/assets"),
     Shader = require("@nathanfaucett/shader"),
     Material = require("@nathanfaucett/material"),
     Geometry = require("@nathanfaucett/geometry"),
+    Texture = require("@nathanfaucett/texture"),
     WebGLPlugin = require("@nathanfaucett/webgl_plugin"),
     MeshRenderer = require("..");
 
 
-var Scene = sceneGraph.Scene,
+var myAssets = assets.Assets.create(),
+
+    Scene = sceneGraph.Scene,
     Entity = sceneGraph.Entity,
 
     SceneRenderer = sceneRenderer.SceneRenderer,
@@ -27,20 +31,32 @@ var scene = global.scene = Scene.create(),
         name: "shader_simple",
         src: null,
         vertex: [
+            "varying vec2 vUv;",
             "varying vec3 vNormal;",
 
             "void main(void) {",
+            "   vUv = getUV();",
             "   vNormal = getNormal();",
             "   gl_Position = perspectiveMatrix * modelViewMatrix * getPosition();",
             "}"
         ].join("\n"),
         fragment: [
+            "uniform sampler2D texture;",
+
+            "varying vec2 vUv;",
             "varying vec3 vNormal;",
 
             "void main(void) {",
-            "    gl_FragColor = vec4(vNormal, 1.0);",
+            "    vec3 light = vec3(1.0, 1.0, 1.0);",
+            "    float dprod = max(0.2, dot(vNormal, light));",
+            "    gl_FragColor = texture2D(texture, vec2(vUv.s, vUv.t)) * vec4(dprod, dprod, dprod, 1.0);",
             "}"
         ].join("\n")
+    }),
+
+    texture = Texture.create({
+        name: "texture_crate",
+        src: "./crate.png"
     }),
 
     material = Material.create({
@@ -48,10 +64,16 @@ var scene = global.scene = Scene.create(),
         src: null,
         shader: shader,
         wireframe: false,
-        wireframeLineWidth: 1
+        wireframeLineWidth: 1,
+        uniforms: {
+            "texture": texture
+        }
     }),
 
     geometry = Geometry.create({name: "geometry", src: "geometry.json"});
+
+
+myAssets.add(shader, texture, material, geometry);
 
 
 camera.set(512, 512);
@@ -59,12 +81,12 @@ camera.set(512, 512);
 
 var cameraTransform = Transform3D.create();
 
-cameraTransform.setPosition([10, 10, 5]);
+cameraTransform.setPosition([0, 10, 5]);
 cameraTransform.lookAt([0, 0, 0]);
 
 scene.addEntity(Entity.create().addComponent(cameraTransform, camera));
 
-geometry.load(function onLoad(error) {
+myAssets.load(function onLoad(error) {
     var meshTransform = Transform3D.create();
 
     scene.addEntity(
