@@ -35,8 +35,8 @@
     "jshint": "^2.9.3"
   },
   "dependencies": {
-    "@nathanfaucett/mat3": "^0.0.2",
-    "@nathanfaucett/mat4": "^0.0.4",
+    "@nathanfaucett/mat3": "^0.0.3",
+    "@nathanfaucett/mat4": "^0.0.5",
     "@nathanfaucett/scene_renderer": "git://github.com/nathanfaucett/js-scene_renderer.git"
   }
 }
